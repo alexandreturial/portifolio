@@ -23,26 +23,23 @@ const PostsQuery = `{
 }`;
 
 const flatten = arr =>
-    arr.map(({node: {frontmatter, ...rest}}) =>({
-        ...frontmatter,
-        date_timestamp: parseInt(
-            (new Date(frontmatter.date_timestamp).getTime() / 1000).toFixed(0)
-        ),
-        ...rest
-    }))
-
+  arr.map(({ node: { frontmatter, ...rest } }) => ({
+    ...frontmatter,
+    date_timestamp: parseInt(
+      (new Date(frontmatter.date_timestamp).getTime() / 1000).toFixed(0)
+    ),
+    ...rest,
+  }))
+const settings = { attributesToSnippet: [`excerpt:20`] }
 
 const queries = [
-    {
-      query: PostsQuery,
-      transformer: ({ data }) => flatten(data.posts.edges), // optional
-      indexName: 'posts', 
-      settings: {
-        attributesToSnippet: ['excerpt:20']
-      },
-      matchFields: ['slug', 'modified'], // Array<String> overrides main match fields, optional
-    },
-];
+  {
+    query: postQuery,
+    transformer: ({ data }) => flatten(data.posts.edges),
+    indexName: process.env.GATSBY_ALGOLIA_INDEX_NAME,
+    settings,
+  },
+]
 
 
 module.exports = queries;
